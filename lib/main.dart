@@ -32,12 +32,18 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   // Initializing the stream controller
   StreamController<String> streamController = StreamController();
-
+  // Multiple Stream builder we can use instead of initializing n numbers of stream builder
+  late Stream<String> dataStream;
   // Initializing the text editing controller
   TextEditingController textEntered = TextEditingController();
 
   // making the Init state and initializing as BroadCastStream
   // Returns a multi-subscription stream that produces the same events as this.
+  @override
+  void initState() {
+    dataStream = streamController.stream.asBroadcastStream();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,9 +67,27 @@ class _MyHomePageState extends State<MyHomePage> {
                 height: 5,
               ),
               // It is Initializing the Streambuilder to use the stream controller
-
               StreamBuilder<String>(
-                  stream: streamController.stream, // value captured
+                  stream: dataStream, // value captured
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Text(
+                        'NO Data',
+                        style: TextStyle(
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w400),
+                      );
+                    } else {
+                      return Text(
+                        snapshot.data ?? 'NUll Value...',
+                        style: const TextStyle(
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w400),
+                      );
+                    }
+                  }),
+              StreamBuilder<String>(
+                  stream: dataStream, // value captured
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return const Text(
